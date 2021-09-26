@@ -12,9 +12,10 @@ const (
 	testBaseVariable string = "basevariable"
 )
 
-func Test_initializeClientWithoutKeyVariable(t *testing.T) {
+func Test_initializeClientWithoutKeyEnvVar(t *testing.T) {
 	t.Log("testing InitializeClient: expect error, no AIRTABLE_KEY environment variable")
-	os.Setenv(airtableBaseVariable, testBaseVariable)
+	_ = os.Unsetenv(airtableKeyVariable)
+	_ = os.Setenv(airtableBaseVariable, testBaseVariable)
 
 	err := testInitializeClient(
 		t,
@@ -24,8 +25,22 @@ func Test_initializeClientWithoutKeyVariable(t *testing.T) {
 
 	if err == nil {
 		t.Fatalf("Error should not be nil because the AIRTABLE_KEY environment variable is required to initialize the client")
-	} else {
-		t.Logf("why is this an error [%s]", err)
+	}
+
+}
+func Test_initializeClientWithoutBaseEnvVar(t *testing.T) {
+	t.Log("testing InitializeClient: expect error, no AIRTABLE_BASE environment variable")
+	_ = os.Setenv(airtableKeyVariable, testKeyVariable)
+	_ = os.Unsetenv(airtableBaseVariable)
+
+	err := testInitializeClient(
+		t,
+		defaultAirtableHost,
+		testKeyVariable,
+		testBaseVariable)
+
+	if err == nil {
+		t.Fatalf("Error should not be nil because the AIRTABLE_BASE environment variable is required to initialize the client")
 	}
 }
 
